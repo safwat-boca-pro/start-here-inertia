@@ -1,8 +1,12 @@
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
+import noUnsanitized from 'eslint-plugin-no-unsanitized';
+import oxlint from 'eslint-plugin-oxlint';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import security from 'eslint-plugin-security';
+import sonarjs from 'eslint-plugin-sonarjs';
 import globals from 'globals';
 import typescript from 'typescript-eslint';
 
@@ -71,6 +75,28 @@ export default [
         },
     },
     {
+        // Rules oxlint doesn't cover: cognitive complexity/code smells, Node
+        // security footguns, and DOM XSS sinks (dangerouslySetInnerHTML, etc.).
+        ...sonarjs.configs.recommended,
+        files: ['resources/js/**/*.{ts,tsx}'],
+        ignores: ['resources/js/wayfinder/**'],
+    },
+    {
+        ...security.configs.recommended,
+        files: ['resources/js/**/*.{ts,tsx}'],
+        ignores: ['resources/js/wayfinder/**'],
+        rules: {
+            ...security.configs.recommended.rules,
+            // Flags ordinary array/object indexing everywhere; not useful for this frontend.
+            'security/detect-object-injection': 'off',
+        },
+    },
+    {
+        ...noUnsanitized.configs.recommended,
+        files: ['resources/js/**/*.{ts,tsx}'],
+        ignores: ['resources/js/wayfinder/**'],
+    },
+    {
         ignores: [
             'vendor',
             'node_modules',
@@ -81,4 +107,5 @@ export default [
         ],
     },
     prettier, // Turn off all rules that might conflict with Prettier
+    ...oxlint.buildFromOxlintConfigFile('./.oxlintrc.json'), // Disable ESLint rules oxlint already covers; keep this last
 ];

@@ -607,6 +607,7 @@ function SidebarMenuSkeleton({
   // also ensures we have a stable reference to the style object
   const [skeletonStyle] = React.useState(() => (
       {
+        // eslint-disable-next-line sonarjs/pseudo-random -- cosmetic skeleton width jitter, not security-sensitive
         "--skeleton-width": `${Math.floor(Math.random() * 40) + 50}%` // Random width between 50 to 90%.
     } as React.CSSProperties
   ))
