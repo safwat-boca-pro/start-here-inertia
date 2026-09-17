@@ -7,6 +7,9 @@ This directory contains documented procedures for common development tasks in th
 ### Data Models
 - [Create Model](./create-eloquent-model.md) - Creating Eloquent models with migrations, factories, and tests
 
+### API Endpoints
+- [Create API Endpoint](./create-api-endpoint.md) - Adding a documented JSON API endpoint with Scramble
+
 ## SOP Format
 
 Each SOP follows a standard format:
@@ -32,6 +35,7 @@ When creating a new SOP:
 | Task | SOP Document | Complexity |
 |------|--------------|------------|
 | Create new model | [create-eloquent-model.md](./create-eloquent-model.md) | Medium |
+| Create API endpoint | [create-api-endpoint.md](./create-api-endpoint.md) | Medium |
 
 ## Maintenance
 
