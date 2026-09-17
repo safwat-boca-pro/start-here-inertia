@@ -47,6 +47,7 @@ Automatic activity logging on all models:
 ### 🧪 Testing & Quality
 
 - **Pest** for elegant PHP testing
+- **Test Impact Analysis (TIA)** — re-runs only tests affected by your changes locally
 - **PHPStan** with Larastan for static analysis
 - **Pint** for code formatting
 - **Composer License Checker** for dependency auditing
@@ -92,11 +93,20 @@ npm run build             # Production build
 # Testing
 composer test             # Run all checks (license, PHPStan, Pint, Pest)
 php artisan test          # Run Pest tests only
+composer test:tia         # Run only tests affected by your changes (needs PCOV or Xdebug)
 
 # Code Quality
 vendor/bin/pint           # Fix code style
 vendor/bin/phpstan        # Static analysis
 ```
+
+> TIA requires a PCOV or Xdebug coverage driver enabled locally. On Laravel Herd, use
+> `herd coverage vendor/bin/pest --parallel --tia` if your PHP version has driver support;
+> otherwise install PCOV (`pecl install pcov`, recommended for lower overhead) or Xdebug.
+> If `pecl install pcov` fails with a missing `pcre2.h` (common on Homebrew PHP), retry with
+> `CFLAGS="-I$(brew --prefix pcre2)/include" pecl install pcov`. CI records and shares a
+> baseline automatically (`.github/workflows/tia-baseline.yml`), so your first local `--tia`
+> run downloads it instead of rebuilding from scratch.
 
 ## Project Structure
 

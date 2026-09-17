@@ -86,7 +86,7 @@
             "npm run format:check",
             "npm run lint:check",
             "npm run types",
-            "@php artisan test --parallel"
+            "./vendor/bin/pest --parallel --ci"
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",

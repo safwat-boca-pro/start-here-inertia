@@ -1,0 +1,86 @@
+name: TIA Baseline
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  DB_CONNECTION: pgsql
+  DB_HOST: 127.0.0.1
+  DB_PORT: 5432
+  DB_USERNAME: postgres
+  DB_PASSWORD: postgres
+  DB_DATABASE: laravel_test
+
+jobs:
+  baseline:
+    name: "Record TIA Baseline"
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: laravel_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: "checkout repository"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "setup PHP 8.5"
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.5"
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: "install dependencies"
+        run: composer install --prefer-dist
+
+      - name: "setup node"
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      - name: "install node dependencies"
+        run: npm ci
+
+      - name: "copy .env.example to .env"
+        run: cp .env.example .env
+
+      - name: "set the application key"
+        run: php artisan key:generate
+
+      - name: "run artisan migrate"
+        run: php artisan migrate
+
+      - name: "record TIA baseline"
+        run: ./vendor/bin/pest --parallel --tia --coverage --fresh
+
+      - name: "resolve TIA baseline path"
+        id: baseline
+        run: echo "path=$(./vendor/bin/pest --baseline)" >> "$GITHUB_OUTPUT"
+
+      - name: "upload TIA baseline"
+        uses: actions/upload-artifact@v4
+        with:
+          name: pest-tia-baseline
+          path: ${{ steps.baseline.outputs.path }}
+          include-hidden-files: true
+          retention-days: 30
