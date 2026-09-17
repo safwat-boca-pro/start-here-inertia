@@ -71,7 +71,7 @@ jobs:
         run: php artisan migrate
 
       - name: "record TIA baseline"
-        run: ./vendor/bin/pest --parallel --tia --coverage --fresh
+        run: ./vendor/bin/pest --parallel --tia --fresh
 
       - name: "resolve TIA baseline path"
         id: baseline
